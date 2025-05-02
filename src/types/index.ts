@@ -1,4 +1,3 @@
-
 export type DealStatus = 
   | 'Lead'
   | 'Contacted'
@@ -22,6 +21,7 @@ export interface Deal {
   reminder: string | null;
   notes: string | null;
   createdAt: string;
+  user_id?: string | null;
 }
 
 export interface User {

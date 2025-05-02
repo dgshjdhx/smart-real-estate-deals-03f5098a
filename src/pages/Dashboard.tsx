@@ -23,8 +23,22 @@ const Dashboard = () => {
           throw error;
         }
         
+        // Transform the data to match the Deal interface
         if (data) {
-          setDeals(data as Deal[]);
+          const formattedDeals: Deal[] = data.map(item => ({
+            id: item.id,
+            propertyName: item.propertyName,
+            clientName: item.clientName,
+            status: item.status as Deal['status'],
+            statusUpdatedDate: item.statusUpdatedDate,
+            estimatedCloseDate: item.estimatedCloseDate,
+            reminder: item.reminder,
+            notes: item.notes,
+            createdAt: item.createdAt,
+            user_id: item.user_id
+          }));
+          
+          setDeals(formattedDeals);
         } else {
           setDeals([]);
         }
@@ -47,7 +61,10 @@ const Dashboard = () => {
     try {
       const { error } = await supabase
         .from("deals")
-        .update({ status: newStatus, statusUpdatedDate: new Date().toISOString() })
+        .update({ 
+          status: newStatus, 
+          statusUpdatedDate: new Date().toISOString() 
+        })
         .eq("id", dealId);
 
       if (error) throw error;
