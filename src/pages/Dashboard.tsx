@@ -1,22 +1,75 @@
 
 import { useState, useEffect } from "react";
-import { mockDeals } from "../data/mockDeals";
 import { Button } from "../components/ui/button";
 import KanbanBoard from "../components/KanbanBoard";
 import { Plus } from "lucide-react";
+import { Deal } from "../types";
+import { supabase } from "../integrations/supabase/client";
+import { useToast } from "../components/ui/use-toast";
 
 const Dashboard = () => {
-  const [deals, setDeals] = useState(mockDeals);
+  const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Simulate loading state
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchDeals = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("deals")
+          .select("*");
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          setDeals(data as Deal[]);
+        } else {
+          setDeals([]);
+        }
+      } catch (error) {
+        console.error("Error fetching deals:", error);
+        toast({
+          title: "Error fetching deals",
+          description: "There was a problem loading your deals.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDeals();
+  }, [toast]);
+
+  const handleDealStatusChange = async (dealId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("deals")
+        .update({ status: newStatus, statusUpdatedDate: new Date().toISOString() })
+        .eq("id", dealId);
+
+      if (error) throw error;
+
+      // Update local state
+      setDeals(prevDeals => prevDeals.map(deal => 
+        deal.id === dealId ? { ...deal, status: newStatus as any, statusUpdatedDate: new Date().toISOString() } : deal
+      ));
+
+      toast({
+        title: "Status updated",
+        description: `Deal status updated to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error("Error updating deal:", error);
+      toast({
+        title: "Error updating status",
+        description: "There was a problem updating the deal status.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +98,7 @@ const Dashboard = () => {
             <div className="text-gray-500">Loading deals...</div>
           </div>
         ) : (
-          <KanbanBoard deals={deals} />
+          <KanbanBoard deals={deals} onDealStatusChange={handleDealStatusChange} />
         )}
       </main>
     </div>

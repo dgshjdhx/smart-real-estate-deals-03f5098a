@@ -82,11 +82,6 @@ const Privacy = () => {
               We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new 
               Privacy Policy on this page and updating the "Last updated" date.
             </p>
-            
-            <h2 className="text-xl font-semibold mt-8 mb-4">9. Contact Information</h2>
-            <p className="mb-4">
-              For questions about this Privacy Policy, please contact us at privacy@dealtracker.com.
-            </p>
           </div>
         </div>
       </main>

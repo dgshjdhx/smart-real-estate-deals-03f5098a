@@ -1,15 +1,25 @@
 
-import { Deal, StatusColors } from "../types";
+import { Deal, StatusColors, DealStatus, ALL_STATUSES } from "../types";
 import { Card } from "./ui/card";
 import { format } from "date-fns";
-import { Clock } from "lucide-react";
+import { Clock, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useIsMobile } from "../hooks/use-mobile";
 
 interface DealCardProps {
   deal: Deal;
   onClick: (deal: Deal) => void;
+  onStatusChange?: (deal: Deal, newStatus: DealStatus) => void;
 }
 
-const DealCard = ({ deal, onClick }: DealCardProps) => {
+const DealCard = ({ deal, onClick, onStatusChange }: DealCardProps) => {
+  const isMobile = useIsMobile();
+  
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "";
     return format(new Date(dateString), "MMM d, yyyy");
@@ -17,11 +27,42 @@ const DealCard = ({ deal, onClick }: DealCardProps) => {
 
   return (
     <Card 
-      className="deal-card cursor-pointer" 
+      className="deal-card cursor-pointer relative" 
       onClick={() => onClick(deal)}
     >
-      <div className={`status-tag ${StatusColors[deal.status]} mb-2`}>
-        {deal.status}
+      <div className="flex justify-between items-start mb-2">
+        <div className={`status-tag ${StatusColors[deal.status]}`}>
+          {deal.status}
+        </div>
+        
+        {isMobile && onStatusChange && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <button className="p-1 rounded-full hover:bg-gray-100">
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {ALL_STATUSES.map((status) => (
+                <DropdownMenuItem 
+                  key={status}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (status !== deal.status) {
+                      onStatusChange(deal, status);
+                    }
+                  }}
+                  className={`${deal.status === status ? 'font-bold' : ''}`}
+                >
+                  <div className="flex items-center">
+                    <span className={`inline-block w-2 h-2 rounded-full ${StatusColors[status]} mr-2`}></span>
+                    {status}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
       
       <h3 className="font-medium mb-2">{deal.propertyName}</h3>

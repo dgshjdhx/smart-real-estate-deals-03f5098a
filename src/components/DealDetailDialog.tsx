@@ -7,24 +7,35 @@ import {
   DialogFooter
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { Deal, StatusColors } from "../types";
+import { Deal, StatusColors, DealStatus, ALL_STATUSES } from "../types";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { useIsMobile } from "../hooks/use-mobile";
 
 interface DealDetailDialogProps {
   deal: Deal;
   open: boolean;
   onClose: () => void;
+  onStatusChange: (deal: Deal, newStatus: DealStatus) => void;
 }
 
-const DealDetailDialog = ({ deal, open, onClose }: DealDetailDialogProps) => {
+const DealDetailDialog = ({ deal, open, onClose, onStatusChange }: DealDetailDialogProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";
     return format(new Date(dateString), "MMMM d, yyyy");
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={`${isMobile ? 'w-[95vw] max-w-[95vw] p-4' : 'sm:max-w-md'}`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span className="mr-2">{deal.propertyName}</span>
@@ -38,6 +49,28 @@ const DealDetailDialog = ({ deal, open, onClose }: DealDetailDialogProps) => {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Client</h3>
             <p className="text-base">{deal.clientName}</p>
+          </div>
+          
+          <div>
+            <h3 className="text-sm font-medium text-gray-500">Status</h3>
+            <Select
+              defaultValue={deal.status}
+              onValueChange={(value) => onStatusChange(deal, value as DealStatus)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {ALL_STATUSES.map(status => (
+                  <SelectItem key={status} value={status}>
+                    <div className="flex items-center">
+                      <span className={`inline-block w-2 h-2 rounded-full ${StatusColors[status]} mr-2`}></span>
+                      {status}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div>
