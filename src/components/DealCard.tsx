@@ -37,7 +37,7 @@ const DealCard = ({ deal, onClick, onStatusChange, onDelete }: DealCardProps) =>
           {deal.status}
         </div>
         
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
           {isMobile && onStatusChange && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -73,6 +73,7 @@ const DealCard = ({ deal, onClick, onStatusChange, onDelete }: DealCardProps) =>
               e.stopPropagation();
               onDelete();
             }}
+            aria-label="Delete deal"
           >
             <Trash className="h-4 w-4" />
           </button>
