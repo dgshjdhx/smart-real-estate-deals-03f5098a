@@ -8,9 +8,10 @@ import { useIsMobile } from "../hooks/use-mobile";
 interface KanbanBoardProps {
   deals: Deal[];
   onDealStatusChange: (dealId: string, newStatus: string) => Promise<void>;
+  onDeleteDeal: (dealId: string) => Promise<void>;
 }
 
-const KanbanBoard = ({ deals, onDealStatusChange }: KanbanBoardProps) => {
+const KanbanBoard = ({ deals, onDealStatusChange, onDeleteDeal }: KanbanBoardProps) => {
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [draggingDeal, setDraggingDeal] = useState<Deal | null>(null);
   const isMobile = useIsMobile();
@@ -45,6 +46,13 @@ const KanbanBoard = ({ deals, onDealStatusChange }: KanbanBoardProps) => {
     onDealStatusChange(deal.id, newStatus);
   };
 
+  const handleDeleteDeal = (dealId: string) => {
+    onDeleteDeal(dealId);
+    if (selectedDeal && selectedDeal.id === dealId) {
+      setSelectedDeal(null);
+    }
+  };
+
   return (
     <div className="overflow-x-auto pb-4">
       <div className={`flex ${isMobile ? 'flex-col' : 'min-w-max'} gap-4`}>
@@ -75,6 +83,7 @@ const KanbanBoard = ({ deals, onDealStatusChange }: KanbanBoardProps) => {
                     deal={deal} 
                     onClick={handleDealClick}
                     onStatusChange={isMobile ? handleStatusChange : undefined}
+                    onDelete={() => handleDeleteDeal(deal.id)}
                   />
                 </div>
               ))}
@@ -95,6 +104,7 @@ const KanbanBoard = ({ deals, onDealStatusChange }: KanbanBoardProps) => {
           open={!!selectedDeal} 
           onClose={() => setSelectedDeal(null)}
           onStatusChange={handleStatusChange}
+          onDelete={() => handleDeleteDeal(selectedDeal.id)}
         />
       )}
     </div>

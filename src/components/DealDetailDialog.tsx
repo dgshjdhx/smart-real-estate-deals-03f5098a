@@ -17,15 +17,17 @@ import {
   SelectValue,
 } from "./ui/select";
 import { useIsMobile } from "../hooks/use-mobile";
+import { Trash } from "lucide-react";
 
 interface DealDetailDialogProps {
   deal: Deal;
   open: boolean;
   onClose: () => void;
   onStatusChange: (deal: Deal, newStatus: DealStatus) => void;
+  onDelete: () => void;
 }
 
-const DealDetailDialog = ({ deal, open, onClose, onStatusChange }: DealDetailDialogProps) => {
+const DealDetailDialog = ({ deal, open, onClose, onStatusChange, onDelete }: DealDetailDialogProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";
     return format(new Date(dateString), "MMMM d, yyyy");
@@ -100,7 +102,14 @@ const DealDetailDialog = ({ deal, open, onClose, onStatusChange }: DealDetailDia
           )}
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="flex justify-between items-center">
+          <Button variant="destructive" onClick={() => {
+            onDelete();
+            onClose();
+          }} className="flex items-center gap-1">
+            <Trash className="h-4 w-4" />
+            <span>Delete</span>
+          </Button>
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>

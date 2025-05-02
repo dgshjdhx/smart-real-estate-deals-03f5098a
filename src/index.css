@@ -1,13 +1,11 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -16,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221 83% 53%;
+    --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -33,7 +31,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
   }
@@ -48,7 +46,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -73,58 +71,51 @@
   * {
     @apply border-border;
   }
-  
-  html, body {
-    font-family: 'Inter', sans-serif;
-    @apply bg-[#f9f9f9] text-foreground;
+  body {
+    @apply bg-background text-foreground;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
-  }
+}
 
-  /* Deal status tags */
-  .status-tag {
-    @apply px-3 py-1 text-xs font-medium rounded-full text-white;
-  }
+.status-tag {
+  @apply text-xs inline-block px-2 py-0.5 rounded-full mb-1;
+}
 
-  .status-lead {
-    @apply bg-status-lead;
-  }
-  
-  .status-contacted {
-    @apply bg-status-contacted;
-  }
-  
-  .status-offerSent {
-    @apply bg-status-offerSent;
-  }
-  
-  .status-underContract {
-    @apply bg-status-underContract;
-  }
-  
-  .status-appraisal {
-    @apply bg-status-appraisal;
-  }
-  
-  .status-inspection {
-    @apply bg-status-inspection;
-  }
-  
-  .status-financing {
-    @apply bg-status-financing;
-  }
-  
-  .status-closingScheduled {
-    @apply bg-status-closingScheduled;
-  }
-  
-  .status-closed {
-    @apply bg-status-closed;
-  }
+.status-lead {
+  @apply bg-blue-100 text-blue-800;
+}
 
-  .deal-card {
-    @apply bg-white rounded-xl shadow-md p-4 mb-4 border border-gray-100 transition-all hover:shadow-lg;
-  }
+.status-contacted {
+  @apply bg-indigo-100 text-indigo-800;
+}
+
+.status-offerSent {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.status-underContract {
+  @apply bg-pink-100 text-pink-800;
+}
+
+.status-appraisal {
+  @apply bg-orange-100 text-orange-800;
+}
+
+.status-inspection {
+  @apply bg-amber-100 text-amber-800;
+}
+
+.status-financing {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-closingScheduled {
+  @apply bg-lime-100 text-lime-800;
+}
+
+.status-closed {
+  @apply bg-green-100 text-green-800;
+}
+
+.deal-card {
+  @apply mb-2 p-3 bg-white hover:shadow-md transition-shadow cursor-pointer;
 }
