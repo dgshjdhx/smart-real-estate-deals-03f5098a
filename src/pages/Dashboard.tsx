@@ -27,14 +27,14 @@ const Dashboard = () => {
         if (data) {
           const formattedDeals: Deal[] = data.map(item => ({
             id: item.id,
-            propertyName: item.propertyName,
-            clientName: item.clientName,
+            propertyName: item.propertyname,
+            clientName: item.clientname,
             status: item.status as Deal['status'],
-            statusUpdatedDate: item.statusUpdatedDate,
-            estimatedCloseDate: item.estimatedCloseDate,
+            statusUpdatedDate: item.statusupdateddate,
+            estimatedCloseDate: item.estimatedclosedate,
             reminder: item.reminder,
             notes: item.notes,
-            createdAt: item.createdAt,
+            createdAt: item.createdat,
             user_id: item.user_id
           }));
           
@@ -63,7 +63,7 @@ const Dashboard = () => {
         .from("deals")
         .update({ 
           status: newStatus, 
-          statusUpdatedDate: new Date().toISOString() 
+          statusupdateddate: new Date().toISOString() 
         })
         .eq("id", dealId);
 
