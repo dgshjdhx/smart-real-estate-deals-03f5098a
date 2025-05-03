@@ -40,8 +40,8 @@ export const MAX_DEALS: Record<SubscriptionTier, number> = {
 
 export const SUBSCRIPTION_PRICES: Record<SubscriptionTier, number> = {
   'Free': 0,
-  'Pro': 19,
-  'Broker': 39
+  'Pro': 10,
+  'Broker': 20
 };
 
 export const ALL_STATUSES: DealStatus[] = [
