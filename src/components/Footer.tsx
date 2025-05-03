@@ -17,7 +17,7 @@ const Footer = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-8">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 mb-2">Product</h3>
               <ul className="space-y-2">
@@ -46,15 +46,6 @@ const Footer = () => {
                   <Link to="/privacy" className="text-sm text-gray-600 hover:text-primary">
                     Privacy Policy
                   </Link>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Contact</h3>
-              <ul className="space-y-2">
-                <li className="text-sm text-gray-600">
-                  support@dealtracker.com
                 </li>
               </ul>
             </div>
