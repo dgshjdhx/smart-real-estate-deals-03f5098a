@@ -1,7 +1,7 @@
 
-import { Button } from "./ui/button";
 import { SubscriptionTier, SUBSCRIPTION_PRICES, MAX_DEALS } from "../types";
 import { Check } from "lucide-react";
+import SubscribeButton from "./SubscribeButton";
 
 interface PlanProps {
   tier: SubscriptionTier;
@@ -13,8 +13,8 @@ const PricingPlans = () => {
     <div className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-2">Simple, Transparent Pricing</h2>
-          <p className="text-gray-600">Choose the plan that fits your business needs</p>
+          <h2 className="text-3xl font-bold mb-2">מחירים פשוטים ושקופים</h2>
+          <p className="text-gray-600">בחר את התכנית המתאימה לצרכי העסק שלך</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -37,7 +37,7 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
     } flex flex-col justify-between bg-white animate-fade-in`}>
       {isPopular && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-xs font-medium">
-          Most Popular
+          הפופולרי ביותר
         </div>
       )}
       
@@ -45,36 +45,30 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
         <h3 className="text-xl font-bold mb-2">{tier}</h3>
         <div className="flex items-baseline mb-4">
           <span className="text-3xl font-bold">${price}</span>
-          {price > 0 && <span className="text-gray-500 ml-1">/month</span>}
+          {price > 0 && <span className="text-gray-500 ml-1">/ חודש</span>}
         </div>
         
         <div className="mb-6">
           <p className="text-gray-600 mb-4">
-            {maxDeals === Infinity ? 'Unlimited' : `Up to ${maxDeals}`} open deals
+            {maxDeals === Infinity ? 'ללא הגבלה' : `עד ${maxDeals}`} עסקאות פתוחות
           </p>
           
           <ul className="space-y-2">
-            <Feature included>Deal pipeline tracking</Feature>
-            <Feature included>Reminders</Feature>
-            <Feature included>Mobile friendly</Feature>
-            {tier !== "Free" && <Feature included>Archive for closed deals</Feature>}
+            <Feature included>מעקב אחר צינור עסקאות</Feature>
+            <Feature included>תזכורות</Feature>
+            <Feature included>מותאם למובייל</Feature>
+            {tier !== "Free" && <Feature included>ארכיון לעסקאות סגורות</Feature>}
             {tier === "Broker" && (
               <>
-                <Feature included>Priority support</Feature>
-                <Feature included>Advanced analytics</Feature>
+                <Feature included>תמיכה בעדיפות</Feature>
+                <Feature included>ניתוחים מתקדמים</Feature>
               </>
             )}
           </ul>
         </div>
       </div>
       
-      <Button 
-        variant={tier === "Free" ? "outline" : "default"} 
-        className="w-full"
-        disabled={tier === "Free"}
-      >
-        {tier === "Free" ? "Start Free" : `Upgrade to ${tier}`}
-      </Button>
+      <SubscribeButton tier={tier} price={price} />
     </div>
   );
 };
