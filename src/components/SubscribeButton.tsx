@@ -14,19 +14,19 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // יש להחליף את אלה בערכים האמיתיים מהפורטל המפתחים של PayPal
+  // PayPal client ID (public) - replace with your actual client ID from PayPal Developer Dashboard
+  const PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID"; // Replace with your PayPal Client ID
+
+  // Plan IDs should be obtained from your PayPal Dashboard after creating subscription plans
   const PLAN_IDS: Record<SubscriptionTier, string> = {
     'Free': '',
-    'Pro': 'P-1AB23456CD789012EXYZABCD', // דוגמה - החלף בזיהוי תכנית אמיתי
-    'Broker': 'P-2AB23456CD789012EXYZEFGH' // דוגמה - החלף בזיהוי תכנית אמיתי
+    'Pro': 'P-1AB23456CD789012EXYZABCD', // Example - replace with actual plan ID
+    'Broker': 'P-2AB23456CD789012EXYZEFGH' // Example - replace with actual plan ID
   };
-
-  // כתובת ה-API של PayPal (לפיתוח או לייצור)
-  const PAYPAL_API = "https://api-m.sandbox.paypal.com/v1/billing/subscriptions";
   
   const handleSubscribe = async () => {
     if (tier === 'Free') {
-      // אין צורך במנוי עבור התכנית החינמית
+      // No subscription needed for free plan
       toast({
         title: "חשבון חינמי",
         description: "אתה כבר משתמש בגרסה החינמית.",
@@ -36,21 +36,24 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
 
     setLoading(true);
     try {
-      // בסביבת הפיתוח (כאן), אנו פשוט פותחים חלון חדש שמדמה את תהליך ההרשמה של PayPal
-      // בסביבת הייצור, יש להשתמש ב-API אמיתי עם הרשאות גישה מתאימות
+      // In a production environment:
+      // 1. Your server should handle the secure parts of the PayPal API calls using the secret key
+      // 2. The client should only use the client ID for frontend SDK initialization
       
       toast({
         title: "מעבר ל-PayPal",
         description: "מעבירים אותך לעמוד התשלום של PayPal"
       });
       
-      // בסביבת ייצור אמיתית:
-      // 1. שלח בקשה לשרת שלך שיצור מנוי באמצעות פרטי האימות המאובטחים
-      // 2. קבל את כתובת האישור והפנה את המשתמש לשם
-      
-      // פתיחת דף PayPal מדומה עבור הדגמה
+      // For demonstration purposes - in production, integrate with PayPal JS SDK:
+      // https://developer.paypal.com/sdk/js/reference/
       setTimeout(() => {
         const planId = PLAN_IDS[tier];
+        // In production, you would use the PayPal JS SDK to create a subscription
+        // For example:
+        // window.paypal.Subscription.create({ plan_id: planId })
+        
+        // Mock implementation for demonstration
         window.open(
           `https://www.sandbox.paypal.com/webapps/billing/subscriptions?plan_id=${planId}`,
           "_blank"
