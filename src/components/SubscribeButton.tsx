@@ -15,7 +15,7 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   const { toast } = useToast();
 
   // PayPal client ID (public) - replace with your actual client ID from PayPal Developer Dashboard
-  const PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID"; // Replace with your PayPal Client ID
+  const PAYPAL_CLIENT_ID = "AZsWtiYoBnGvXGvtfH7jvjdVqaDeN2LPa8SDA1PRdmvGxsB84qLgPLwnzeSvoLF06bULeXoPlI-a-eLW";
 
   // Plan IDs should be obtained from your PayPal Dashboard after creating subscription plans
   const PLAN_IDS: Record<SubscriptionTier, string> = {
