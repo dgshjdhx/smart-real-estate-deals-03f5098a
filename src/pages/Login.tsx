@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Button } from "../components/ui/button";
@@ -13,7 +13,11 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Get the redirect path from state, or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +26,18 @@ const Login = () => {
     // Simulate login API call
     setTimeout(() => {
       setIsLoading(false);
-      // Redirect to dashboard on successful login (this is just a demo)
+      
+      // Store auth state in localStorage (for demo purposes only)
+      localStorage.setItem('authenticated', 'true');
+      
+      // Redirect to dashboard on successful login
       toast({
         title: "Logged in successfully",
         description: "Welcome back to DealTracker!",
       });
-      navigate("/dashboard");
+      
+      // Navigate to the page they were trying to access
+      navigate(from);
     }, 1500);
   };
 

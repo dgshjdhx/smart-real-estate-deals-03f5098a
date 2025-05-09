@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SubscriptionTier } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface SubscribeButtonProps {
   tier: SubscriptionTier;
@@ -15,6 +16,10 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   const { toast } = useToast();
   const paypalButtonRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const navigate = useNavigate();
+
+  // Mock authenticated state (replace with actual auth check)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // PayPal client ID
   const PAYPAL_CLIENT_ID = "AZsWtiYoBnGvXGvtfH7jvjdVqaDeN2LPa8SDA1PRdmvGxsB84qLgPLwnzeSvoLF06bULeXoPlI-a-eLW";
@@ -22,13 +27,25 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   // Plan IDs from PayPal dashboard
   const PLAN_IDS: Record<SubscriptionTier, string> = {
     'Free': '',
-    'Pro': 'P-95S85872026293901NAPIKDQ', // The Pro plan ID you provided
-    'Broker': '' // Removed as requested
+    'Pro': 'P-95S85872026293901NAPIKDQ',
+    'Broker': ''
   };
 
   useEffect(() => {
-    // Only load PayPal script for the Pro tier
-    if (tier === 'Pro' && paypalButtonRef.current && !scriptLoaded) {
+    // Simulate auth check
+    // In a real application, you would check the user's authentication state here
+    const checkAuth = async () => {
+      // This is a placeholder. Replace with actual auth check using your auth system
+      const fakeAuthCheck = localStorage.getItem('authenticated') === 'true';
+      setIsAuthenticated(fakeAuthCheck);
+    };
+    
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    // Only load PayPal script for Pro tier and when user is authenticated
+    if (tier === 'Pro' && isAuthenticated && paypalButtonRef.current && !scriptLoaded) {
       const script = document.createElement('script');
       script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
       script.setAttribute('data-sdk-integration-source', 'button-factory');
@@ -58,7 +75,8 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
                 description: `Your subscription (ID: ${data.subscriptionID}) has been activated.`,
               });
               
-              // Here you'd typically update the user's subscription status in your database
+              // Here you'd update the user's subscription status in your database
+              navigate('/dashboard');
             },
             onError: function(err: any) {
               toast({
@@ -79,25 +97,36 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
         }
       };
     }
-  }, [tier, scriptLoaded]);
+  }, [tier, scriptLoaded, isAuthenticated, navigate, toast]);
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = () => {
+    if (!isAuthenticated) {
+      // Redirect to login page if not authenticated
+      toast({
+        title: "Authentication Required",
+        description: "Please log in or sign up before subscribing to a plan.",
+      });
+      navigate('/login');
+      return;
+    }
+    
     if (tier === 'Free') {
       toast({
-        title: "Free Account",
-        description: "You are already using the free version.",
+        title: "Free Plan Activated",
+        description: "You are now using the free version with a limit of 3 deals.",
       });
+      navigate('/dashboard');
       return;
     }
 
-    // For Pro tier, the PayPal button will be displayed
+    // For Pro tier, if authenticated, show PayPal button
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 500);
   };
 
-  if (tier === 'Pro') {
+  if (tier === 'Pro' && isAuthenticated) {
     return (
       <div className="w-full">
         <div ref={paypalButtonRef} className="w-full"></div>
@@ -114,7 +143,6 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   return (
     <Button
       onClick={handleSubscribe}
-      disabled={loading || tier === 'Free'}
       variant={tier === 'Free' ? "outline" : "default"}
       className="w-full"
     >

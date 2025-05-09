@@ -13,6 +13,7 @@ import Pricing from "./pages/Pricing";
 import Features from "./pages/Features";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Payment from "./pages/Payment";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/payment" element={<Payment />} />
           <Route path="/features" element={<Features />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

@@ -1,7 +1,8 @@
 
 import { SubscriptionTier, SUBSCRIPTION_PRICES, MAX_DEALS } from "../types";
 import { Check } from "lucide-react";
-import SubscribeButton from "./SubscribeButton";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface PlanProps {
   tier: SubscriptionTier;
@@ -27,8 +28,13 @@ const PricingPlans = () => {
 };
 
 const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
+  const navigate = useNavigate();
   const maxDeals = MAX_DEALS[tier];
   const price = SUBSCRIPTION_PRICES[tier];
+  
+  const handleSelectPlan = () => {
+    navigate('/payment', { state: { tier, price } });
+  };
   
   return (
     <div className={`relative rounded-xl shadow-md p-6 border ${
@@ -49,7 +55,7 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
         
         <div className="mb-6">
           <p className="text-gray-600 mb-4">
-            {maxDeals === Infinity ? 'Unlimited' : `Up to ${maxDeals}`} open deals
+            {maxDeals === Infinity ? 'Unlimited' : `Up to ${maxDeals}`} deals
           </p>
           
           <ul className="space-y-2">
@@ -67,7 +73,13 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
         </div>
       </div>
       
-      <SubscribeButton tier={tier} price={price} />
+      <Button
+        onClick={handleSelectPlan}
+        variant={tier === 'Free' ? "outline" : "default"}
+        className="w-full"
+      >
+        {tier === 'Free' ? "Start Free" : `Upgrade to ${tier}`}
+      </Button>
     </div>
   );
 };
