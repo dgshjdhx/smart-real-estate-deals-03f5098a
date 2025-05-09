@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SubscriptionTier } from "@/types";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SubscribeButtonProps {
   tier: SubscriptionTier;
@@ -67,17 +68,47 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
                 plan_id: PLAN_IDS[tier]
               });
             },
-            onApprove: function(data: any, actions: any) {
-              toast({
-                title: "Subscription Successful",
-                description: `Your subscription (ID: ${data.subscriptionID}) has been activated.`,
-              });
+            onApprove: async function(data: any, actions: any) {
+              // Update subscription in database
+              try {
+                // In a real app, this would update the user's subscription in the database
+                // For this demo, we'll use localStorage and update Supabase if connected
+                localStorage.setItem('subscriptionTier', tier);
+                localStorage.setItem('subscriptionId', data.subscriptionID);
+                
+                // Try to update the subscription in Supabase if available
+                try {
+                  const { error } = await supabase
+                    .from('user_usage')
+                    .update({ 
+                      is_premium: true,
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('user_id', localStorage.getItem('userId'));
+                    
+                  if (error) {
+                    console.error("Error updating subscription in Supabase:", error);
+                  }
+                } catch (err) {
+                  // Silent fail - Supabase might not be connected in demo mode
+                  console.error("Could not update Supabase:", err);
+                }
               
-              // Update subscription status in localStorage for demo
-              localStorage.setItem('subscriptionTier', tier);
-              
-              // Redirect to dashboard
-              navigate('/dashboard');
+                toast({
+                  title: "Subscription Successful",
+                  description: `Your ${tier} subscription (ID: ${data.subscriptionID}) has been activated.`,
+                });
+                
+                // Redirect to dashboard
+                navigate('/dashboard');
+              } catch (err) {
+                console.error("Error processing subscription:", err);
+                toast({
+                  variant: "destructive",
+                  title: "Subscription Error",
+                  description: "There was a problem activating your subscription. Please try again.",
+                });
+              }
             },
             onError: function(err: any) {
               toast({

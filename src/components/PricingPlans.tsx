@@ -42,6 +42,7 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
   const price = SUBSCRIPTION_PRICES[tier];
   
   const handleSelectPlan = () => {
+    // For authentication check, we'll redirect to payment which has auth guard
     navigate('/payment', { state: { tier, price } });
   };
   
@@ -64,7 +65,7 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
         
         <div className="mb-6">
           <p className="text-gray-600 mb-4">
-            {maxDeals === Infinity ? 'Unlimited' : `Up to ${maxDeals}`} deals
+            {tier === 'Free' ? `Up to ${maxDeals}` : `Up to ${maxDeals}`} deals
           </p>
           
           <ul className="space-y-2">

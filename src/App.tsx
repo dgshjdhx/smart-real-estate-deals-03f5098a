@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Payment from "./pages/Payment";
 import { SubscriptionTier, MAX_DEALS } from "./types";
+import { toast } from "./hooks/use-toast";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,15 @@ const SubscriptionCheck = ({ children }: { children: JSX.Element }) => {
     // For demo, we'll use localStorage
     const deals = JSON.parse(localStorage.getItem('userDeals') || '[]');
     setDealCount(deals.length);
+    
+    // Show toast notification if user is close to the limit
+    if (tier === 'Free' && deals.length > 0 && deals.length === MAX_DEALS[tier] - 1) {
+      toast({
+        title: "Deal Limit Warning",
+        description: `You have ${MAX_DEALS[tier] - deals.length} deal remaining in your free plan.`,
+        variant: "warning"
+      });
+    }
   }, [location]);
   
   // Check if user has reached deal limit

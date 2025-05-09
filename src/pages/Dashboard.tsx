@@ -2,16 +2,20 @@
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import KanbanBoard from "../components/KanbanBoard";
-import { Plus, Trash } from "lucide-react";
-import { Deal, DealStatus, ALL_STATUSES } from "../types";
+import { Plus, Info } from "lucide-react";
+import { Deal, DealStatus, ALL_STATUSES, MAX_DEALS } from "../types";
 import { supabase } from "../integrations/supabase/client";
-import { useToast } from "../components/ui/use-toast";
+import { useToast } from "../hooks/use-toast";
 import NewDealDialog from "../components/NewDealDialog";
+import { Link } from "react-router-dom";
+import { Alert, AlertDescription } from "../components/ui/alert";
 
 const Dashboard = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDealDialogOpen, setIsDealDialogOpen] = useState(false);
+  const [currentTier, setCurrentTier] = useState<'Free' | 'Pro'>('Free');
+  const [dealsRemaining, setDealsRemaining] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -41,8 +45,30 @@ const Dashboard = () => {
           }));
           
           setDeals(formattedDeals);
+          
+          // Store deals in localStorage for other components to access
+          localStorage.setItem('userDeals', JSON.stringify(formattedDeals));
+          
+          // Check subscription tier and calculate remaining deals
+          const tier = localStorage.getItem('subscriptionTier') as 'Free' | 'Pro' || 'Free';
+          setCurrentTier(tier);
+          
+          const maxDeals = MAX_DEALS[tier];
+          const remaining = Math.max(0, maxDeals - formattedDeals.length);
+          setDealsRemaining(remaining);
+          
+          // Warning if close to limit
+          if (tier === 'Free' && remaining === 1) {
+            toast({
+              title: "Deal Limit Warning",
+              description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
+              variant: "warning"
+            });
+          }
         } else {
           setDeals([]);
+          localStorage.setItem('userDeals', JSON.stringify([]));
+          setDealsRemaining(MAX_DEALS[currentTier]);
         }
       } catch (error) {
         console.error("Error fetching deals:", error);
@@ -57,6 +83,14 @@ const Dashboard = () => {
     };
 
     fetchDeals();
+    
+    // Check subscription status
+    const checkSubscription = () => {
+      const tier = localStorage.getItem('subscriptionTier') as 'Free' | 'Pro' || 'Free';
+      setCurrentTier(tier);
+    };
+    
+    checkSubscription();
   }, [toast]);
 
   const handleDealStatusChange = async (dealId: string, newStatus: string) => {
@@ -91,6 +125,16 @@ const Dashboard = () => {
   };
 
   const handleAddDeal = async (newDeal: Omit<Deal, 'id' | 'statusUpdatedDate' | 'createdAt'>) => {
+    // Check if we've reached the deal limit
+    if (deals.length >= MAX_DEALS[currentTier]) {
+      toast({
+        title: "Deal Limit Reached",
+        description: `You've reached the maximum of ${MAX_DEALS[currentTier]} deals for your ${currentTier} plan. Please upgrade to add more deals.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       // Convert data to match database column names
       const dealData = {
@@ -125,12 +169,35 @@ const Dashboard = () => {
         };
 
         // Add the new deal to state
-        setDeals(prevDeals => [...prevDeals, formattedDeal]);
+        const updatedDeals = [...deals, formattedDeal];
+        setDeals(updatedDeals);
+        
+        // Update localStorage
+        localStorage.setItem('userDeals', JSON.stringify(updatedDeals));
+        
+        // Update deals remaining
+        const remaining = Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
+        setDealsRemaining(remaining);
 
         toast({
           title: "Deal added",
           description: "New deal has been successfully created",
         });
+        
+        // Show warning if we're close to the limit
+        if (currentTier === 'Free' && remaining === 1) {
+          toast({
+            title: "Deal Limit Warning",
+            description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
+            variant: "warning"
+          });
+        } else if (remaining === 0) {
+          toast({
+            title: "Deal Limit Reached",
+            description: `You've reached the maximum of ${MAX_DEALS[currentTier]} deals for your ${currentTier} plan.`,
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error("Error adding deal:", error);
@@ -152,7 +219,15 @@ const Dashboard = () => {
       if (error) throw error;
 
       // Remove the deal from state
-      setDeals(prevDeals => prevDeals.filter(deal => deal.id !== dealId));
+      const updatedDeals = deals.filter(deal => deal.id !== dealId);
+      setDeals(updatedDeals);
+      
+      // Update localStorage
+      localStorage.setItem('userDeals', JSON.stringify(updatedDeals));
+      
+      // Update deals remaining
+      const remaining = Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
+      setDealsRemaining(remaining);
 
       toast({
         title: "Deal deleted",
@@ -174,21 +249,56 @@ const Dashboard = () => {
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">DealTracker</h1>
-            <Button className="flex items-center gap-1" onClick={() => setIsDealDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              <span>New Deal</span>
-            </Button>
+            <div className="flex items-center gap-3">
+              {currentTier === 'Free' && (
+                <Link to="/pricing" className="text-sm text-primary">
+                  Upgrade to Pro
+                </Link>
+              )}
+              <Button 
+                className="flex items-center gap-1" 
+                onClick={() => setIsDealDialogOpen(true)}
+                disabled={deals.length >= MAX_DEALS[currentTier]}
+              >
+                <Plus className="h-4 w-4" />
+                <span>New Deal</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-4">My Deal Pipeline</h2>
-          <p className="text-gray-600">
-            Track and manage all your deals in one place
-          </p>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h2 className="text-3xl font-bold">My Deal Pipeline</h2>
+              <p className="text-gray-600">
+                Track and manage all your deals in one place
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm bg-gray-100 px-3 py-1 rounded-md">
+              <Info className="h-4 w-4 text-gray-500" />
+              <span>
+                {currentTier === 'Free' 
+                  ? `${dealsRemaining} of ${MAX_DEALS.Free} deals remaining` 
+                  : `${deals.length} of ${MAX_DEALS.Pro} deals used`}
+              </span>
+            </div>
+          </div>
         </div>
+        
+        {currentTier === 'Free' && dealsRemaining === 0 && (
+          <Alert className="mb-6 bg-amber-50 text-amber-800 border-amber-200">
+            <AlertDescription>
+              You've reached the maximum number of deals for your Free plan. 
+              <Link to="/pricing" className="font-medium ml-1 underline">
+                Upgrade to Pro
+              </Link> to add more deals.
+            </AlertDescription>
+          </Alert>
+        )}
         
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
