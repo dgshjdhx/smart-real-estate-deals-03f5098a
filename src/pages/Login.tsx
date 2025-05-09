@@ -16,8 +16,10 @@ const Login = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-  // Get the redirect path from state, or default to dashboard
+  // Get the redirect path from state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
+  const tier = location.state?.tier;
+  const price = location.state?.price;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +32,23 @@ const Login = () => {
       // Store auth state in localStorage (for demo purposes only)
       localStorage.setItem('authenticated', 'true');
       
-      // Redirect to dashboard on successful login
       toast({
         title: "Logged in successfully",
         description: "Welcome back to DealTracker!",
       });
       
-      // Navigate to the page they were trying to access
-      navigate(from);
+      // Check if user was trying to subscribe before login
+      const pendingSubscription = localStorage.getItem('pendingSubscription');
+      
+      // Navigate based on pending actions
+      if (from === '/payment' && tier) {
+        navigate('/payment', { state: { tier, price } });
+      } else if (pendingSubscription) {
+        localStorage.removeItem('pendingSubscription');
+        navigate('/payment', { state: { tier: pendingSubscription, price: pendingSubscription === 'Pro' ? 10 : 0 } });
+      } else {
+        navigate(from);
+      }
     }, 1500);
   };
 
@@ -49,6 +60,11 @@ const Login = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Welcome Back</h1>
             <p className="text-gray-600 mt-2">Sign in to access your deal pipeline</p>
+            {tier && (
+              <p className="text-primary mt-2">
+                Sign in to continue with your {tier} subscription
+              </p>
+            )}
           </div>
           
           <div className="bg-white p-8 shadow-md rounded-xl border border-gray-100">

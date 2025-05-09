@@ -2,7 +2,7 @@
 import { SubscriptionTier, SUBSCRIPTION_PRICES, MAX_DEALS } from "../types";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface PlanProps {
   tier: SubscriptionTier;
@@ -10,12 +10,21 @@ interface PlanProps {
 }
 
 const PricingPlans = () => {
+  const location = useLocation();
+  const limitReached = location.state?.limitReached;
+  
   return (
     <div className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-2">Simple, Transparent Pricing</h2>
           <p className="text-gray-600">Choose the plan that's right for your business needs</p>
+          {limitReached && (
+            <div className="mt-4 p-4 bg-amber-50 text-amber-800 rounded-lg">
+              You've reached the maximum number of deals for your current plan. 
+              Please upgrade to continue adding more deals.
+            </div>
+          )}
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

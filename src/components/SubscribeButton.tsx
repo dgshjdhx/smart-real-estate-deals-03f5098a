@@ -32,10 +32,8 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   };
 
   useEffect(() => {
-    // Simulate auth check
-    // In a real application, you would check the user's authentication state here
+    // Check authentication state
     const checkAuth = async () => {
-      // This is a placeholder. Replace with actual auth check using your auth system
       const fakeAuthCheck = localStorage.getItem('authenticated') === 'true';
       setIsAuthenticated(fakeAuthCheck);
     };
@@ -44,7 +42,7 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   }, []);
 
   useEffect(() => {
-    // Only load PayPal script for Pro tier and when user is authenticated
+    // Load PayPal script for Pro tier and when user is authenticated
     if (tier === 'Pro' && isAuthenticated && paypalButtonRef.current && !scriptLoaded) {
       const script = document.createElement('script');
       script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
@@ -75,7 +73,10 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
                 description: `Your subscription (ID: ${data.subscriptionID}) has been activated.`,
               });
               
-              // Here you'd update the user's subscription status in your database
+              // Update subscription status in localStorage for demo
+              localStorage.setItem('subscriptionTier', tier);
+              
+              // Redirect to dashboard
               navigate('/dashboard');
             },
             onError: function(err: any) {
@@ -101,16 +102,20 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
 
   const handleSubscribe = () => {
     if (!isAuthenticated) {
-      // Redirect to login page if not authenticated
+      // Redirect to login page with return destination
       toast({
         title: "Authentication Required",
         description: "Please log in or sign up before subscribing to a plan.",
       });
-      navigate('/login');
+      // Save the intended subscription tier and redirect path for after login
+      localStorage.setItem('pendingSubscription', tier);
+      navigate('/login', { state: { from: { pathname: '/payment' }, tier, price } });
       return;
     }
     
     if (tier === 'Free') {
+      // Activate free plan
+      localStorage.setItem('subscriptionTier', 'Free');
       toast({
         title: "Free Plan Activated",
         description: "You are now using the free version with a limit of 3 deals.",
