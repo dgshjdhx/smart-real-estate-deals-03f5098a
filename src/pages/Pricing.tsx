@@ -50,11 +50,10 @@ const Pricing = () => {
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-medium mb-2">What's the difference between plans?</h3>
+                  <h3 className="text-lg font-medium mb-2">What's included in the Pro plan?</h3>
                   <p className="text-gray-600">
-                    The main difference is the number of open deals you can track at once. The Free plan allows 
-                    up to 3 open deals, Pro allows up to 30, and Broker offers unlimited deals. Premium plans also 
-                    include additional features like deal archives and analytics.
+                    The Pro plan includes up to 30 open deals, closed deal archives, priority support, and advanced analytics.
+                    The Free plan allows only up to 3 open deals with basic features.
                   </p>
                 </div>
               </div>
