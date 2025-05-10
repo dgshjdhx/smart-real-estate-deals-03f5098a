@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import KanbanBoard from "../components/KanbanBoard";
@@ -21,10 +20,21 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDealsAndSubscription = async () => {
       try {
-        // Fetch deals
+        // Get current user session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          setIsLoading(false);
+          return;
+        }
+        
+        const userId = session.user.id;
+        
+        // Fetch deals for the current user only
         const { data: dealsData, error: dealsError } = await supabase
           .from("deals")
-          .select("*");
+          .select("*")
+          .eq("user_id", userId);
+          
         if (dealsError) throw dealsError;
         let formattedDeals: Deal[] = [];
         if (dealsData) {
@@ -48,7 +58,6 @@ const Dashboard = () => {
         }
 
         // Fetch subscription status from Supabase
-        const { data: { session } } = await supabase.auth.getSession();
         let tier: 'Free' | 'Pro' = 'Free';
         if (session) {
           const { data: usageData, error: usageError } = await supabase
@@ -123,7 +132,7 @@ const Dashboard = () => {
 
   const handleAddDeal = async (newDeal: Omit<Deal, 'id' | 'statusUpdatedDate' | 'createdAt'>) => {
     // Check if we've reached the deal limit
-    if (deals.length >= MAX_DEALS[currentTier]) {
+    if (currentTier === 'Free' && deals.length >= MAX_DEALS[currentTier]) {
       toast({
         title: "Deal Limit Reached",
         description: `You've reached the maximum of ${MAX_DEALS[currentTier]} deals for your ${currentTier} plan. Please upgrade to add more deals.`,
@@ -133,6 +142,17 @@ const Dashboard = () => {
     }
     
     try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "You must be signed in to add deals.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Convert data to match database column names
       const dealData = {
         propertyname: newDeal.propertyName,
@@ -140,7 +160,8 @@ const Dashboard = () => {
         status: newDeal.status,
         estimatedclosedate: newDeal.estimatedCloseDate,
         reminder: newDeal.reminder,
-        notes: newDeal.notes
+        notes: newDeal.notes,
+        user_id: session.user.id // Always set the user_id to the current user
       };
       
       const { data, error } = await supabase
@@ -223,7 +244,7 @@ const Dashboard = () => {
       localStorage.setItem('userDeals', JSON.stringify(updatedDeals));
       
       // Update deals remaining
-      const remaining = Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
+      const remaining = MAX_DEALS[currentTier] === Infinity ? Infinity : Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
       setDealsRemaining(remaining);
 
       toast({
