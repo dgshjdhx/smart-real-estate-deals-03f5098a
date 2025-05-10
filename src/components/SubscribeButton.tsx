@@ -22,13 +22,13 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   // Check authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // PayPal client ID - Updated to use production client ID
-  const PAYPAL_CLIENT_ID = "AchaWPn6PQRnEUuG_F3LuBAs_YI8L3Ij39P1DZrFmhQxvvzxUEDmf46m9MB2-UvaGCB_5ZED94wI6jRm";
+  // PayPal client ID - Updated with user's production client ID
+  const PAYPAL_CLIENT_ID = "AaoH9kiiwOvnuEd_3DJ818p-V6hrLY9mdehaz3SHlc1GHqQK3sZmE534dW1EmXtKIHrfEluoO58TUmSG";
 
-  // Plan IDs from PayPal dashboard
+  // Plan IDs from PayPal dashboard - Updated with user's production plan ID
   const PLAN_IDS: Record<SubscriptionTier, string> = {
     'Free': '',
-    'Pro': 'P-95S85872026293901NAPIKDQ',
+    'Pro': 'P-48439475786320024NAPKXJA',
     'Broker': ''
   };
 
@@ -59,7 +59,7 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
           window.paypal.Buttons({
             style: {
               shape: 'rect',
-              color: 'blue',
+              color: 'gold', // Updated to match your configuration
               layout: 'vertical',
               label: 'subscribe'
             },
