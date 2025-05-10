@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import KanbanBoard from "../components/KanbanBoard";
@@ -64,7 +65,7 @@ const Dashboard = () => {
 
         // Calculate remaining deals
         const maxDeals = MAX_DEALS[tier];
-        const remaining = Math.max(0, maxDeals - formattedDeals.length);
+        const remaining = maxDeals === Infinity ? Infinity : Math.max(0, maxDeals - formattedDeals.length);
         setDealsRemaining(remaining);
 
         // Warning if close to limit
@@ -172,7 +173,7 @@ const Dashboard = () => {
         localStorage.setItem('userDeals', JSON.stringify(updatedDeals));
         
         // Update deals remaining
-        const remaining = Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
+        const remaining = MAX_DEALS[currentTier] === Infinity ? Infinity : Math.max(0, MAX_DEALS[currentTier] - updatedDeals.length);
         setDealsRemaining(remaining);
 
         toast({
@@ -187,7 +188,7 @@ const Dashboard = () => {
             description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
             variant: "default"
           });
-        } else if (remaining === 0) {
+        } else if (currentTier === 'Free' && remaining === 0) {
           toast({
             title: "Deal Limit Reached",
             description: `You've reached the maximum of ${MAX_DEALS[currentTier]} deals for your ${currentTier} plan.`,
@@ -254,7 +255,7 @@ const Dashboard = () => {
               <Button 
                 className="flex items-center gap-1" 
                 onClick={() => setIsDealDialogOpen(true)}
-                disabled={deals.length >= MAX_DEALS[currentTier]}
+                disabled={currentTier === 'Free' && deals.length >= MAX_DEALS[currentTier]}
               >
                 <Plus className="h-4 w-4" />
                 <span>New Deal</span>
@@ -279,7 +280,7 @@ const Dashboard = () => {
               <span>
                 {currentTier === 'Free' 
                   ? `${dealsRemaining} of ${MAX_DEALS.Free} deals remaining` 
-                  : `${deals.length} of ${MAX_DEALS.Pro} deals used`}
+                  : `Unlimited deals available`}
               </span>
             </div>
           </div>

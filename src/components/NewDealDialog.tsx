@@ -67,7 +67,7 @@ const NewDealDialog = ({ open, onClose, onAddDeal }: NewDealDialogProps) => {
     
     // Check if user has reached deal limit
     const maxDeals = tier === 'Pro' ? MAX_DEALS.Pro : MAX_DEALS.Free;
-    setHasReachedLimit(deals.length >= maxDeals);
+    setHasReachedLimit(maxDeals !== Infinity && deals.length >= maxDeals);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,7 +113,7 @@ const NewDealDialog = ({ open, onClose, onAddDeal }: NewDealDialogProps) => {
 
   const getDealsRemaining = () => {
     const maxDeals = currentTier === 'Pro' ? MAX_DEALS.Pro : MAX_DEALS.Free;
-    return Math.max(0, maxDeals - dealCount);
+    return maxDeals === Infinity ? 'Unlimited' : Math.max(0, maxDeals - dealCount);
   };
 
   return (
@@ -146,6 +146,11 @@ const NewDealDialog = ({ open, onClose, onAddDeal }: NewDealDialogProps) => {
               {currentTier === 'Free' && (
                 <div className="text-sm text-muted-foreground my-2">
                   Deals remaining: {getDealsRemaining()} of {MAX_DEALS.Free}
+                </div>
+              )}
+              {currentTier === 'Pro' && (
+                <div className="text-sm text-muted-foreground my-2">
+                  Unlimited deals available with your Pro subscription
                 </div>
               )}
               

@@ -1,3 +1,4 @@
+
 export type DealStatus = 
   | 'Lead'
   | 'Contacted'
@@ -34,7 +35,7 @@ export interface User {
 
 export const MAX_DEALS: Record<SubscriptionTier, number> = {
   'Free': 3,
-  'Pro': 30,
+  'Pro': Infinity,
   'Broker': Infinity
 };
 

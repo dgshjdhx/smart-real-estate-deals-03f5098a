@@ -65,7 +65,7 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
         
         <div className="mb-6">
           <p className="text-gray-600 mb-4">
-            {tier === 'Free' ? `Up to ${maxDeals}` : `Up to ${maxDeals}`} deals
+            {tier === 'Free' ? `Up to ${maxDeals} deals` : `Unlimited deals`}
           </p>
           
           <ul className="space-y-2">
