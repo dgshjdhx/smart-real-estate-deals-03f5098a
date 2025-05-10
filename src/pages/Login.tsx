@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -7,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useToast } from "../components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,35 +21,41 @@ const Login = () => {
   const tier = location.state?.tier;
   const price = location.state?.price;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login API call
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Store auth state in localStorage (for demo purposes only)
-      localStorage.setItem('authenticated', 'true');
-      
+    // Use Supabase authentication
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    setIsLoading(false);
+
+    if (error) {
       toast({
-        title: "Logged in successfully",
-        description: "Welcome back to DealTracker!",
+        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Invalid email or password."
       });
-      
-      // Check if user was trying to subscribe before login
-      const pendingSubscription = localStorage.getItem('pendingSubscription');
-      
-      // Navigate based on pending actions
-      if (from === '/payment' && tier) {
-        navigate('/payment', { state: { tier, price } });
-      } else if (pendingSubscription) {
-        localStorage.removeItem('pendingSubscription');
-        navigate('/payment', { state: { tier: pendingSubscription, price: pendingSubscription === 'Pro' ? 10 : 0 } });
-      } else {
-        navigate(from);
-      }
-    }, 1500);
+      return;
+    }
+
+    toast({
+      title: "Logged in successfully",
+      description: "Welcome back to DealTracker!",
+    });
+    
+    // Navigate based on pending actions
+    const pendingSubscription = localStorage.getItem('pendingSubscription');
+    if (from === '/payment' && tier) {
+      navigate('/payment', { state: { tier, price } });
+    } else if (pendingSubscription) {
+      localStorage.removeItem('pendingSubscription');
+      navigate('/payment', { state: { tier: pendingSubscription, price: pendingSubscription === 'Pro' ? 10 : 0 } });
+    } else {
+      navigate(from);
+    }
   };
 
   return (

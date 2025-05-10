@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -19,7 +18,7 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // Mock authenticated state (replace with actual auth check)
+  // Check authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // PayPal client ID
@@ -35,8 +34,8 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   useEffect(() => {
     // Check authentication state
     const checkAuth = async () => {
-      const fakeAuthCheck = localStorage.getItem('authenticated') === 'true';
-      setIsAuthenticated(fakeAuthCheck);
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
     };
     
     checkAuth();
@@ -71,27 +70,22 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
             onApprove: async function(data: any, actions: any) {
               // Update subscription in database
               try {
-                // In a real app, this would update the user's subscription in the database
-                // For this demo, we'll use localStorage and update Supabase if connected
-                localStorage.setItem('subscriptionTier', tier);
-                localStorage.setItem('subscriptionId', data.subscriptionID);
-                
-                // Try to update the subscription in Supabase if available
-                try {
-                  const { error } = await supabase
-                    .from('user_usage')
-                    .update({ 
-                      is_premium: true,
-                      updated_at: new Date().toISOString()
-                    })
-                    .eq('user_id', localStorage.getItem('userId'));
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                  throw new Error('No active session');
+                }
+
+                // Update the subscription in Supabase
+                const { error } = await supabase
+                  .from('user_usage')
+                  .update({ 
+                    is_premium: true,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('user_id', session.user.id);
                     
-                  if (error) {
-                    console.error("Error updating subscription in Supabase:", error);
-                  }
-                } catch (err) {
-                  // Silent fail - Supabase might not be connected in demo mode
-                  console.error("Could not update Supabase:", err);
+                if (error) {
+                  throw error;
                 }
               
                 toast({

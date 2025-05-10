@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -8,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useToast } from "../components/ui/use-toast";
 import { Checkbox } from "../components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -18,7 +18,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!agreedToTerms) {
@@ -31,16 +31,30 @@ const Signup = () => {
     }
     
     setIsLoading(true);
-    
-    // Simulate signup API call
-    setTimeout(() => {
-      setIsLoading(false);
+    // Use Supabase signup
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name }
+      }
+    });
+    setIsLoading(false);
+
+    if (error) {
       toast({
-        title: "Account created successfully",
-        description: "Welcome to DealTracker!",
+        variant: "destructive",
+        title: "Signup failed",
+        description: error.message || "Could not create account."
       });
-      navigate("/dashboard");
-    }, 1500);
+      return;
+    }
+
+    toast({
+      title: "Account created successfully",
+      description: "Please check your email to confirm your account before logging in.",
+    });
+    navigate("/login");
   };
 
   return (

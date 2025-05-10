@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -7,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { SubscriptionTier } from "@/types";
 import SubscribeButton from "@/components/SubscribeButton";
+import { supabase } from "@/integrations/supabase/client";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -14,17 +14,57 @@ const Payment = () => {
   const location = useLocation();
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('Free');
   const [price, setPrice] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Parse state passed from pricing page
+  // Check authentication and parse state passed from pricing page
   useEffect(() => {
-    if (location.state && location.state.tier) {
-      setSelectedTier(location.state.tier as SubscriptionTier);
-      setPrice(location.state.price || 0);
-    } else {
-      // If no tier was selected, redirect back to pricing
-      navigate('/pricing');
-    }
-  }, [location.state, navigate]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+
+      if (!session && location.state?.tier !== 'Free') {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in or sign up before subscribing to a plan.",
+        });
+        navigate('/login', { 
+          state: { 
+            from: { pathname: '/payment' }, 
+            tier: location.state?.tier,
+            price: location.state?.price 
+          } 
+        });
+        return;
+      }
+
+      if (location.state && location.state.tier) {
+        setSelectedTier(location.state.tier as SubscriptionTier);
+        setPrice(location.state.price || 0);
+      } else {
+        // If no tier was selected, redirect back to pricing
+        navigate('/pricing');
+      }
+    };
+    
+    checkAuth();
+  }, [location.state, navigate, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
