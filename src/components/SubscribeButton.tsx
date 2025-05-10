@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -21,8 +22,8 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
   // Check authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // PayPal client ID
-  const PAYPAL_CLIENT_ID = "AZsWtiYoBnGvXGvtfH7jvjdVqaDeN2LPa8SDA1PRdmvGxsB84qLgPLwnzeSvoLF06bULeXoPlI-a-eLW";
+  // PayPal client ID - Updated to use production client ID
+  const PAYPAL_CLIENT_ID = "AchaWPn6PQRnEUuG_F3LuBAs_YI8L3Ij39P1DZrFmhQxvvzxUEDmf46m9MB2-UvaGCB_5ZED94wI6jRm";
 
   // Plan IDs from PayPal dashboard
   const PLAN_IDS: Record<SubscriptionTier, string> = {
