@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import KanbanBoard from "../components/KanbanBoard";
@@ -19,19 +18,16 @@ const Dashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchDeals = async () => {
+    const fetchDealsAndSubscription = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch deals
+        const { data: dealsData, error: dealsError } = await supabase
           .from("deals")
           .select("*");
-        
-        if (error) {
-          throw error;
-        }
-        
-        // Transform the data to match the Deal interface
-        if (data) {
-          const formattedDeals: Deal[] = data.map(item => ({
+        if (dealsError) throw dealsError;
+        let formattedDeals: Deal[] = [];
+        if (dealsData) {
+          formattedDeals = dealsData.map(item => ({
             id: item.id,
             propertyName: item.propertyname,
             clientName: item.clientname,
@@ -43,54 +39,54 @@ const Dashboard = () => {
             createdAt: item.createdat,
             user_id: item.user_id
           }));
-          
           setDeals(formattedDeals);
-          
-          // Store deals in localStorage for other components to access
           localStorage.setItem('userDeals', JSON.stringify(formattedDeals));
-          
-          // Check subscription tier and calculate remaining deals
-          const tier = localStorage.getItem('subscriptionTier') as 'Free' | 'Pro' || 'Free';
-          setCurrentTier(tier);
-          
-          const maxDeals = MAX_DEALS[tier];
-          const remaining = Math.max(0, maxDeals - formattedDeals.length);
-          setDealsRemaining(remaining);
-          
-          // Warning if close to limit
-          if (tier === 'Free' && remaining === 1) {
-            toast({
-              title: "Deal Limit Warning",
-              description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
-              variant: "warning"
-            });
-          }
         } else {
           setDeals([]);
           localStorage.setItem('userDeals', JSON.stringify([]));
-          setDealsRemaining(MAX_DEALS[currentTier]);
+        }
+
+        // Fetch subscription status from Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        let tier: 'Free' | 'Pro' = 'Free';
+        if (session) {
+          const { data: usageData, error: usageError } = await supabase
+            .from('user_usage')
+            .select('is_premium')
+            .eq('user_id', session.user.id)
+            .single();
+          if (!usageError && usageData && usageData.is_premium) {
+            tier = 'Pro';
+          }
+        }
+        setCurrentTier(tier);
+        localStorage.setItem('subscriptionTier', tier);
+
+        // Calculate remaining deals
+        const maxDeals = MAX_DEALS[tier];
+        const remaining = Math.max(0, maxDeals - formattedDeals.length);
+        setDealsRemaining(remaining);
+
+        // Warning if close to limit
+        if (tier === 'Free' && remaining === 1) {
+          toast({
+            title: "Deal Limit Warning",
+            description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
+            variant: "default"
+          });
         }
       } catch (error) {
-        console.error("Error fetching deals:", error);
+        console.error("Error fetching deals or subscription:", error);
         toast({
-          title: "Error fetching deals",
-          description: "There was a problem loading your deals.",
+          title: "Error fetching data",
+          description: "There was a problem loading your deals or subscription status.",
           variant: "destructive"
         });
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchDeals();
-    
-    // Check subscription status
-    const checkSubscription = () => {
-      const tier = localStorage.getItem('subscriptionTier') as 'Free' | 'Pro' || 'Free';
-      setCurrentTier(tier);
-    };
-    
-    checkSubscription();
+    fetchDealsAndSubscription();
   }, [toast]);
 
   const handleDealStatusChange = async (dealId: string, newStatus: string) => {
@@ -189,7 +185,7 @@ const Dashboard = () => {
           toast({
             title: "Deal Limit Warning",
             description: "You have only 1 deal remaining in your free plan. Consider upgrading for more deals.",
-            variant: "warning"
+            variant: "default"
           });
         } else if (remaining === 0) {
           toast({
