@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,19 +16,34 @@ import Signup from "./pages/Signup";
 import Payment from "./pages/Payment";
 import { SubscriptionTier, MAX_DEALS } from "./types";
 import { toast } from "./hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
 // Auth requirement component
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const location = useLocation();
-  const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    };
+    checkSession();
+  }, []);
+
+  if (isLoading) {
+    return <div style={{textAlign: 'center', marginTop: '3rem'}}>Checking authentication...</div>;
+  }
+
   if (!isAuthenticated) {
     // Redirect to login with return path
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
+
   return children;
 };
 
@@ -54,7 +68,7 @@ const SubscriptionCheck = ({ children }: { children: JSX.Element }) => {
       toast({
         title: "Deal Limit Warning",
         description: `You have ${MAX_DEALS[tier] - deals.length} deal remaining in your free plan.`,
-        variant: "warning"
+        variant: "default"
       });
     }
   }, [location]);

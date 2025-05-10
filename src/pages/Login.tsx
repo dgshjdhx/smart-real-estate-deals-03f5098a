@@ -54,7 +54,7 @@ const Login = () => {
       localStorage.removeItem('pendingSubscription');
       navigate('/payment', { state: { tier: pendingSubscription, price: pendingSubscription === 'Pro' ? 10 : 0 } });
     } else {
-      navigate(from);
+      navigate('/dashboard');
     }
   };
 

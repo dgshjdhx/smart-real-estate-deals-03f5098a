@@ -87,14 +87,17 @@ const SubscribeButton: React.FC<SubscribeButtonProps> = ({ tier, price }) => {
                 if (error) {
                   throw error;
                 }
-              
+                // Update localStorage immediately so UI updates
+                localStorage.setItem('subscriptionTier', 'Pro');
                 toast({
                   title: "Subscription Successful",
                   description: `Your ${tier} subscription (ID: ${data.subscriptionID}) has been activated.`,
                 });
-                
-                // Redirect to dashboard
+                // Redirect to dashboard (React navigation and hard reload fallback)
                 navigate('/dashboard');
+                setTimeout(() => {
+                  window.location.href = '/dashboard';
+                }, 500);
               } catch (err) {
                 console.error("Error processing subscription:", err);
                 toast({
