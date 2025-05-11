@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -92,7 +93,7 @@ const Payment = () => {
                   <div className="flex justify-between">
                     <span>Deal Limit:</span>
                     <span className="font-medium">
-                      {selectedTier === 'Free' ? '3 deals' : '30 deals'}
+                      {selectedTier === 'Free' ? '3 deals' : 'Unlimited deals'}
                     </span>
                   </div>
                 </div>
@@ -106,7 +107,6 @@ const Payment = () => {
                     {selectedTier !== "Free" && <li>• Closed deals archive</li>}
                     {selectedTier === "Pro" && (
                       <>
-                        <li>• Priority support</li>
                         <li>• Advanced analytics</li>
                       </>
                     )}

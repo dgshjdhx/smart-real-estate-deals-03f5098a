@@ -15,13 +15,13 @@ const Privacy = () => {
             
             <h2 className="text-xl font-semibold mt-8 mb-4">1. Information We Collect</h2>
             <p className="mb-4">
-              DealTracker collects the following information:
+              We collect the following data when you use DealTracker:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li className="mb-2">Account information (name, email, etc.)</li>
-              <li className="mb-2">Deal information that you enter into the system</li>
-              <li className="mb-2">Usage data about how you interact with our service</li>
-              <li className="mb-2">Payment information (processed securely by PayPal)</li>
+              <li className="mb-2">Account details (name, email, password hash)</li>
+              <li className="mb-2">Deal-related information you submit</li>
+              <li className="mb-2">Usage data (logins, clicks, time on site)</li>
+              <li className="mb-2">Payment data (processed securely via PayPal)</li>
             </ul>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">2. How We Use Your Information</h2>
@@ -29,58 +29,69 @@ const Privacy = () => {
               We use your information to:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li className="mb-2">Provide and maintain our service</li>
-              <li className="mb-2">Process payments and manage your subscription</li>
-              <li className="mb-2">Improve and personalize your experience</li>
-              <li className="mb-2">Communicate with you about service updates or changes</li>
-              <li className="mb-2">Respond to your inquiries and provide customer support</li>
+              <li className="mb-2">Provide and operate the Service</li>
+              <li className="mb-2">Process payments and manage subscriptions</li>
+              <li className="mb-2">Contact you with important service updates</li>
+              <li className="mb-2">Improve and personalize user experience</li>
+              <li className="mb-2">Respond to inquiries and support requests</li>
             </ul>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">3. Data Security</h2>
             <p className="mb-4">
-              We implement appropriate security measures to protect your personal information from unauthorized access, 
-              alteration, disclosure, or destruction. However, no method of transmission over the Internet or electronic 
-              storage is 100% secure, and we cannot guarantee absolute security.
+              We implement appropriate security measures. However, no online system is 100% secure, 
+              and we cannot guarantee absolute protection. Use is at your own risk.
             </p>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">4. Data Sharing</h2>
             <p className="mb-4">
-              DealTracker respects your privacy:
+              We do not sell your data. We only share it with trusted service providers (e.g., hosting, 
+              payment processors) for the sole purpose of operating DealTracker. We may also disclose 
+              information if legally required.
             </p>
-            <ul className="list-disc pl-6 mb-4">
-              <li className="mb-2">We do not sell your data to third parties</li>
-              <li className="mb-2">We only share your information with service providers who need it to provide functionality (e.g., payment processing)</li>
-              <li className="mb-2">We may disclose information if required by law or to protect our rights</li>
-            </ul>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">5. Your Rights</h2>
             <p className="mb-4">
               You have the right to:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li className="mb-2">Access your personal data</li>
-              <li className="mb-2">Correct inaccurate data</li>
-              <li className="mb-2">Request deletion of your data</li>
-              <li className="mb-2">Object to our processing of your data</li>
+              <li className="mb-2">Access your data</li>
+              <li className="mb-2">Request corrections</li>
+              <li className="mb-2">Request deletion</li>
               <li className="mb-2">Export your data in a portable format</li>
+              <li className="mb-2">Object to our processing (within legal limits)</li>
             </ul>
-            
-            <h2 className="text-xl font-semibold mt-8 mb-4">6. Cookies and Tracking</h2>
             <p className="mb-4">
-              We use cookies and similar technologies to track activity on our service and hold certain information. 
-              You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
+              For data requests: fitai2468@gmail.com
+            </p>
+            
+            <h2 className="text-xl font-semibold mt-8 mb-4">6. Cookies & Tracking</h2>
+            <p className="mb-4">
+              We use cookies and similar technologies to improve functionality and gather usage insights. 
+              You can control cookies via your browser settings.
             </p>
             
             <h2 className="text-xl font-semibold mt-8 mb-4">7. Children's Privacy</h2>
             <p className="mb-4">
-              Our service is not intended for children under 18 years of age. We do not knowingly collect personal 
-              information from children under 18.
+              The Service is not intended for use by individuals under the age of 18. We do not knowingly 
+              collect personal information from minors.
             </p>
             
-            <h2 className="text-xl font-semibold mt-8 mb-4">8. Changes to Privacy Policy</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">8. Data Retention</h2>
             <p className="mb-4">
-              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new 
-              Privacy Policy on this page and updating the "Last updated" date.
+              We retain your data as long as your account is active. Upon cancellation, your data may be 
+              deleted or archived, at our discretion, after a reasonable period.
+            </p>
+            
+            <h2 className="text-xl font-semibold mt-8 mb-4">9. Changes to Privacy Policy</h2>
+            <p className="mb-4">
+              We may update this Privacy Policy from time to time. Continued use of the Service means you 
+              accept the updated terms.
+            </p>
+            
+            <h2 className="text-xl font-semibold mt-8 mb-4">Contact Information</h2>
+            <p className="mb-4">
+              For any questions regarding this Privacy Policy, please contact us at:
+              fitai2468@gmail.com
             </p>
           </div>
         </div>

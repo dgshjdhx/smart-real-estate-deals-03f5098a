@@ -75,7 +75,6 @@ const PricingCard = ({ tier, isPopular = false }: PlanProps) => {
             {tier !== "Free" && <Feature included>Closed deals archive</Feature>}
             {tier === "Pro" && (
               <>
-                <Feature included>Priority support</Feature>
                 <Feature included>Advanced analytics</Feature>
               </>
             )}
